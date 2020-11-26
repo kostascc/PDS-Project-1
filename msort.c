@@ -114,7 +114,6 @@ void switcharoo_to_lower_triangle(int *I, int *J, int nz){
             t = I[i];
             I[i] = J[i];
             J[i] = t;
-            printf("switcharoo\n");
         }
     }
 

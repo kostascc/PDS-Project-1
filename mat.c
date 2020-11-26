@@ -195,7 +195,7 @@ int * mat_cols(int* mat, int x, int* size){
     *(size) = -1;
 
     if(x > mat[0] || x < 0){
-        printf("mat_xy: Array out of bounds (%d).\n", x);
+        printf("mat_cols: Array out of bounds (%d).\n", x);
         return NULL;
     }
 
@@ -206,7 +206,7 @@ int * mat_cols(int* mat, int x, int* size){
     int cols_end = mat[x+3];
 
     if(cols_begin > cols_end){
-        printf("mat_xy: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
+        printf("mat_cols: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
         return NULL;
     }
     else if(cols_begin == cols_end){

@@ -1,0 +1,5 @@
+dist: trusty
+
+install: make get-deps
+
+run: make clean && make all && clear && ./triangles.o mtx/Lin.mtx -v3 -t1

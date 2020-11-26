@@ -7,6 +7,7 @@
 #include "mmarket.h"
 #include <string.h>
 #include <cilk/cilk.h>
+#include "v3.c"
 
 
 
@@ -154,91 +155,6 @@ void find_triangles_v2_cilk(int* mat){
 
 
 
-void find_triangles_v3(int* mat){
-
-   time_t t;
-   srand((unsigned) time(&t));
-
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
-   int found = 0;
-
-   int M = mat_get_M(mat);
-
-   int *c = (int *)malloc(M * sizeof(int));
-
-
-
-
-   for(int j=0; j<M; j++){
-
-      int size_d_j;
-
-      // Columns of j
-      int *d_j = mat_cols(mat, j, &size_d_j);
-
-
-
-      // For each Column
-      // Find edges to the other columns of j
-      for(int i_indx=0; i_indx<size_d_j; i_indx++){
-
-         
-         int i = d_j[i_indx];
-
-
-         if(i==j) continue;
-
-
-         int size_d_i;
-         int *d_i = mat_cols(mat, i, &size_d_i);
-
-
-         for(int e_indx=0; e_indx<size_d_i; e_indx++){
-            
-            int e = d_i[e_indx];
-
-            if(e==i) continue;
-            
-            for(int k_indx=0; k_indx<size_d_j; k_indx++){
-               
-               
-               int k = d_j[k_indx];
-
-
-               if(i==e||e==j) continue;
-
-               if(e==k){
-                  found+=1;
-               }
-
-            }
-
-         }
-
-      }
-
-   }
-
-   
-   clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-   float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-
-   printf("V3 took %f s, Found %d triangles.\n", delta_us, found); 
-
-
-   return;
-}
-
-
-void find_triangles_v3_cilk(int* mat){
-   //TODO
-   return;
-}
-
-
-
 int main(int argc, char *argv[]){
 
 
@@ -261,12 +177,22 @@ int main(int argc, char *argv[]){
    }
 
 
-   printf("*****************************************************\n");
-   printf("*  ~ Configuration ~\n");
-   printf("* Threads: %d\n", __threads);
-   printf("*****************************************************\n");
 
-   __cilkrts_set_param("nworkers", (char*)__threads);
+   /**********************************
+   ** Welcome and change parameters **
+   **********************************/
+
+   printf("*************************************************\n");
+   printf("*  Triangulinator - Made by K. Chatzis           \n");
+   printf("*    <kachatzis@ece.auth.gr>                     \n");
+   printf("*  ~ Configuration ~                             \n");
+   printf("* Threads: %d                                    \n", __threads);
+   printf("*************************************************\n");
+
+
+   char _tmp_str[4];
+   sprintf(_tmp_str, "%d", __threads);
+   __cilkrts_set_param("nworkers", _tmp_str);
 
 
    // Check Imput Arguments
