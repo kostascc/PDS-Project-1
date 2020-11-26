@@ -18,6 +18,6 @@ extern void merge(
 // in-place merge sort
 extern void mergeSort(int *I, int *J, /*int *V,*/ int len);
 
-
+void switcharoo_to_lower_triangle(int *I, int *J, int nz);
 
 #endif

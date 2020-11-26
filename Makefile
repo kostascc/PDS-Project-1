@@ -35,4 +35,6 @@ test:
 clean:
 	rm -f *.so
 	rm -f *.o
+	rm -f *.lib
 	rm -f *.out
+	rm -f *.txt

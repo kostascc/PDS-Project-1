@@ -100,6 +100,7 @@ int * mmarket_import(char* filename){
 
     printf("[Begin Sorting...]\n");
 
+    switcharoo_to_lower_triangle(I, J, nz);
 
     mergeSort(I, J, nz);
 
@@ -142,10 +143,10 @@ int * mmarket_import(char* filename){
     // j_eq = NULL;
 
 
-    if(nz<100)
-        for(int i=0; i<nz; i++){
-            printf("(%d,%d): %d\n", I[i], J[i], 1);
-        }
+    // if(nz<100)
+    //     for(int i=0; i<nz; i++){
+    //         printf("(%d,%d): %d\n", I[i], J[i], 1);
+    //     }
              
 
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdint.h>
+#include "mat.h"
 #include "msort.h"
 
 
@@ -60,14 +61,142 @@ int * mat_get_d(int* mat){
 // }
 
 
-int mat_xy(int* mat, int x, int y){
+// int mat_xy(int* mat, int x, int y){
 
-    // mat[0] is the length M
-    // mat[1] is the count NZ
+//     // // mat[0] is the length M
+//     // // mat[1] is the count NZ
+
+//     // if(x > mat[0] || x < 0){
+//     //     printf("mat_xy: Array out of bounds (%d).\n", x);
+//     //     return -1;
+//     // }
+
+//     // // Columns Begin
+//     // int cols_begin = mat[x+2];
+
+//     // // Columns End
+//     // int cols_end = mat[x+3];
+
+//     // if(cols_begin > cols_end){
+//     //     printf("mat_xy: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
+//     //     return -1;
+//     // }
+//     // else if(cols_begin == cols_end){
+//     //     // No Connections
+//     //     return 0;
+//     // }
+
+
+//     // // Columns Exist
+//     // // Try finding the requested Y
+
+//     // int* d = slice(mat_get_d(mat), cols_begin+1, cols_end+1);
+
+//     // for(int i=0; i<cols_end-cols_begin; i++){
+
+//     //     if(d[i]==y){
+//     //         //printf("Found (%d,%d)\n", x, y);
+//     //         return 1;
+//     //     }
+//     // }
+
+//     // return 0;
+
+
+//     int* d = (int *)mat_cols(mat, x);
+
+//     if(d == NULL){
+//        printf("mat_xy_b: No Columns Found!\n");
+//        exit(EXIT_FAILURE); 
+//        return -1;
+//     }else if(d[0]==-1){
+//         return 0;
+//     }
+
+
+
+
+//     for(int i=0; i< sizeof(d[0])/sizeof(d) ; i++){
+
+//         if(d[i]==y){
+//             return 1;
+//         }
+
+//     }
+
+//     return 0;
+    
+
+// }
+
+
+
+
+// Read matrix at the (X,Y) point as boolean.
+bool mat_xy_b(int* mat, int x, int y){
+    // // mat[0] is the length M
+    // // mat[1] is the count NZ
+
+    // if(x > mat[0] || x < 0){
+    //     printf("mat_xy: Array out of bounds (%d).\n", x);
+    //     exit(EXIT_FAILURE);
+    //     return false;
+    // }
+
+    // // Columns Begin
+    // int cols_begin = mat[x+2];
+
+    // // Columns End
+    // int cols_end = mat[x+3];
+
+    // if(cols_begin > cols_end){
+    //     printf("mat_xy: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
+    //     exit(EXIT_FAILURE);
+    //     return false;
+    // }
+    // else if(cols_begin == cols_end){
+    //     // No Connections
+    //     return false;
+    // }
+
+
+    // // Columns Exist
+    // // Try finding the requested Y
+
+    int size;
+    int* d = (int *)mat_cols(mat, x, &size);
+
+    if(d == NULL || size==-1){
+       printf("mat_xy_b: No Columns Found!\n");
+       exit(EXIT_FAILURE); 
+       return false;
+    }else if(size==0){
+        return false;
+    }
+
+
+
+
+    for(int i=0; i<size; i++){
+
+        if(d[i]==y){
+            return true;
+        }
+
+    }
+
+    return false;
+}
+
+
+// Read Columns of a certain row.
+int * mat_cols(int* mat, int x, int* size){
+    
+    *(size) = -1;
 
     if(x > mat[0] || x < 0){
         printf("mat_xy: Array out of bounds (%d).\n", x);
-        return -1;
+        return NULL;
     }
 
     // Columns Begin
@@ -78,30 +207,23 @@ int mat_xy(int* mat, int x, int y){
 
     if(cols_begin > cols_end){
         printf("mat_xy: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
-        return -1;
+        return NULL;
     }
     else if(cols_begin == cols_end){
         // No Connections
-        return 0;
+        *(size) = 0;
+        return NULL;
     }
 
 
     // Columns Exist
     // Try finding the requested Y
 
+    *(size) = cols_end-cols_begin;
+
     int* d = slice(mat_get_d(mat), cols_begin+1, cols_end+1);
 
-    for(int i=0; i<cols_end-cols_begin; i++){
-
-        if(d[i]==y){
-            //printf("Found (%d,%d)\n", x, y);
-            return 1;
-        }
-    }
-
-    return 0;
-    
-
+    return d;
 }
 
 
