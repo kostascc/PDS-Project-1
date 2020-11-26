@@ -4,6 +4,6 @@ compiler:
   - clang
   - gcc
 
-install: make all
+install: wget https://github.com/OpenCilk/opencilk-project/releases/download/opencilk%2Fbeta3/OpenCilk-9.0.1-Linux.tar.gz && tar xvzf OpenCilk-9.0.1-Linux.tar.gz && sudo mv OpenCilk-9.0.1-Linux/ /usr/local/ && chmod og+xr /usr/local/OpenCilk-9.0.1-Linux/ -R && make all
 
 run: ./triangles.o mtx/Lin.mtx -v3 -t1
