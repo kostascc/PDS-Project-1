@@ -1,5 +1,9 @@
 dist: trusty
 
-install: make get-deps
+compiler:
+  - clang
+  - gcc
 
-run: make clean && make all && clear && ./triangles.o mtx/Lin.mtx -v3 -t1
+install: make all
+
+run: ./triangles.o mtx/Lin.mtx -v3 -t1
