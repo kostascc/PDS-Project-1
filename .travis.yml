@@ -5,11 +5,12 @@ compiler:
   - gcc
 
 install: 
+  - sudo apt update -y
   - wget https://github.com/OpenCilk/opencilk-project/releases/download/opencilk%2Fbeta3/OpenCilk-9.0.1-Linux.tar.gz 
   - tar xvzf OpenCilk-9.0.1-Linux.tar.gz 
   - sudo mv OpenCilk-9.0.1-Linux/ /usr/local/ 
   - chmod og+xr /usr/local/OpenCilk-9.0.1-Linux/ -R 
-  - sudo apt install -y libtinfo.so.5
+  - sudo apt install -y libtinfo.so.5 libopenmpi-dev openmpi-bin libm.so.6
   - make all
 
 run: ./triangles.o mtx/Lin.mtx -v3 -t1
