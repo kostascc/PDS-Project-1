@@ -93,6 +93,11 @@ int main(int argc, char *argv[]){
       if(strcmp(argv[i],"-v4")==0){
          v4_simple(mat);
       }
+
+
+      if(strcmp(argv[i],"-v4clk")==0){
+         v4_cilk(mat, __threads);
+      }
    }
 
 
