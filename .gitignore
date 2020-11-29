@@ -56,3 +56,9 @@ dkms.conf
 # Output Files
 *.out
 *.txt
+
+
+# mtx Files
+mtx/*
+*.mtx
+mtx/
