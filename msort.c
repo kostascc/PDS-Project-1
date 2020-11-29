@@ -110,7 +110,8 @@ void switcharoo_to_lower_triangle(int *I, int *J, int nz){
     int t;
 
     for(int i=0; i<nz; i++){
-        if(J[i] > I[i]){
+        if(J[i] > I[i])
+        {
             t = I[i];
             I[i] = J[i];
             J[i] = t;

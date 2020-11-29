@@ -9,14 +9,16 @@
 
 
 
-int * mat_get_u(int* mat){
+int * mat_get_u(int* mat)
+{
 
     int * u = (int *) malloc((mat[0]+1) * sizeof(int));  
 
     // mat[0] is the length M
     u[0] = mat[0]+1;
 
-    for(int i=0; i<mat[0]+1; i++){
+    for(int i=0; i<mat[0]+1; i++)
+    {
         u[i+1] = mat[i+2];
     }
 
@@ -26,7 +28,8 @@ int * mat_get_u(int* mat){
 
 
 
-int * mat_get_d(int* mat){
+int * mat_get_d(int* mat)
+{
 
     int * d = (int *) malloc((mat[1]+1) * sizeof(int));  
 
@@ -34,7 +37,8 @@ int * mat_get_d(int* mat){
     // mat[1] is the count NZ
     d[0] = mat[1];
 
-    for(int i=0; i<mat[1]; i++){
+    for(int i=0; i<mat[1]; i++)
+    {
         d[i+1] = mat[i + mat[0]+3];
     }
 
@@ -133,68 +137,95 @@ int * mat_get_d(int* mat){
 
 
 // Read matrix at the (X,Y) point as boolean.
-bool mat_xy_b(int* mat, int x, int y){
-    // // mat[0] is the length M
-    // // mat[1] is the count NZ
+bool mat_xy_b(int* mat, int x, int y)
+{
 
-    // if(x > mat[0] || x < 0){
-    //     printf("mat_xy: Array out of bounds (%d).\n", x);
-    //     exit(EXIT_FAILURE);
-    //     return false;
+    // if(y>x)
+    // {
+    //     int t = x;
+    //     x = y;
+    //     y = t;
     // }
+    
+    if(x > mat[0] || x < 0)
+    {
+        printf("mat_xy_b: Array (x) out of bounds (%d).\n", x);
+        exit(EXIT_FAILURE);
+    }
 
-    // // Columns Begin
-    // int cols_begin = mat[x+2];
+    // Columns Begin
+    int cols_begin = mat[x+2];
 
-    // // Columns End
-    // int cols_end = mat[x+3];
+    // Columns End
+    int cols_end = mat[x+3];
 
-    // if(cols_begin > cols_end){
-    //     printf("mat_xy: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
-    //     exit(EXIT_FAILURE);
-    //     return false;
-    // }
-    // else if(cols_begin == cols_end){
-    //     // No Connections
-    //     return false;
-    // }
-
-
-    // // Columns Exist
-    // // Try finding the requested Y
-
-    int size;
-    int* d = (int *)mat_cols(mat, x, &size);
-
-    if(d == NULL || size==-1){
-       printf("mat_xy_b: No Columns Found!\n");
-       exit(EXIT_FAILURE); 
-       return false;
-    }else if(size==0){
+    if(cols_begin > cols_end)
+    {
+        printf("mat_xy_b: Error decoding CSR data (begin > end) (%d-%d).\n", cols_begin, cols_end);
+        exit(EXIT_FAILURE);
+    }
+    else if(cols_begin == cols_end)
+    {
+        // No Connections
         return false;
     }
 
 
+    // Columns Exist
+    // Try finding the requested Y
 
+    // Realloc with selected size
+    // Can be optimized to hold a size M
+    // for any size of lower array
+    //realloc(*d, s*sizeof(int));
 
-    for(int i=0; i<size; i++){
+    for (int i = cols_begin+1; i < cols_end+1; i++)
+    {
 
-        if(d[i]==y){
+        
+        if( ( mat[i + mat[0]+2] )==y)
+        {
             return true;
         }
-
     }
 
+
     return false;
+
+
+
+    // if(d == NULL || size==-1){
+    //    printf("mat_xy_b: No Columns Found!\n");
+    //    exit(EXIT_FAILURE); 
+    //    return false;
+    // }else if(size==0){
+    //     return false;
+    // }
+
+    // for(int i=0; i<size; i++){
+
+    //     if(d[i]==y){
+    //         return true;
+    //     }
+
+    // }
+
+    // return false;
 }
 
 
+
 // Read Columns of a certain row.
-int * mat_cols(int* mat, int x, int* size){
+void mat_cols(int* mat, int x, int** d, int* size)
+{
+
+
+    // int s = *size;
     
     *(size) = -1;
 
-    if(x > mat[0] || x < 0){
+    if(x > mat[0] || x < 0)
+    {
         printf("mat_cols: Array out of bounds (%d).\n", x);
         return NULL;
     }
@@ -205,11 +236,13 @@ int * mat_cols(int* mat, int x, int* size){
     // Columns End
     int cols_end = mat[x+3];
 
-    if(cols_begin > cols_end){
+    if(cols_begin > cols_end)
+    {
         printf("mat_cols: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
         return NULL;
     }
-    else if(cols_begin == cols_end){
+    else if(cols_begin == cols_end)
+    {
         // No Connections
         *(size) = 0;
         return NULL;
@@ -221,19 +254,31 @@ int * mat_cols(int* mat, int x, int* size){
 
     *(size) = cols_end-cols_begin;
 
-    int* d = slice(mat_get_d(mat), cols_begin+1, cols_end+1);
+    // Realloc with selected size
+    // Can be optimized to hold a size M
+    // for any size of lower array
+    //realloc(*d, s*sizeof(int));
+
+    for (int i = cols_begin+1; i < cols_end+1; i++)
+    {
+        *(*d + i - cols_begin -1 ) = mat[i + mat[0]+2];
+    }
 
     return d;
 }
 
 
 
-int mat_get_M(int* mat){
+int mat_get_M(int* mat)
+{
     int M = mat[0];
-    if(M>0){
+
+    if(M>0)
+    {
         return M;
     }
-    else{
+    else
+    {
         printf("mat_get_M: Error / M out of bounds.\n");
         return -1;
     }
@@ -241,75 +286,19 @@ int mat_get_M(int* mat){
 
 
 
-int mat_get_NZ(int* mat){
+int mat_get_NZ(int* mat)
+{
     int NZ = mat[1];
-    if(NZ>0){
+
+    if(NZ>0)
+    {
         return NZ;
     }
-    else{
+    else
+    {
         printf("mat_get_NZ: Error / NZ out of bounds.\n");
         return -1;
     }
 }
 
 
-// int mat_r(int** m, int x, int y){
-//     return (int)(*( (m+1 + (**(m)) * x + y) ));
-// }
-
-
-// void mat_w(int** m, int x, int y, int v){
-//     printf("FindMult: %d\n", (*m));
-
-//     //printf("w_addr: %u",*( m+1 + ( *(m) * x + y ) );
-    
-//     if (*m==NULL){
-//         printf("Memory Allocation Failed while writing in [%d,%d] on a %dx%d Matrix.\n", x, y, m[0], m[0]); 
-//         exit(EXIT_FAILURE);
-//     }
-
-//     *( m+1 + (int)(*m)  * x + y ) = v;
-
-//     printf(" -> Success\n");
-// }
-
-
-// void mat_create(int** m, int x, int y){
-
-//     printf("Creating Matrix %dx%d.\n", x, y);
-
-//     *m = NULL;
-//     *m = (int*) malloc(( x * y + 1 ) * sizeof(int)) ;
-
-//     **(m) = x;
-
-//     printf("asd2\n");
-//     if(*m == NULL){
-//         printf("Memory Allocation Failed Creating the Matrix (%dx%d / %dbytes) (Addr:%u)\n", x, y, x * y * sizeof(int), &m[1]); 
-//         exit(EXIT_FAILURE); 
-//     }
-
-//     printf("Matrix Created (Addr:%u, mult:%d)\n", m+1, **(m));
-
-//     return;
-// }
-
-
-// int mat_print(int** m){
-
-//     int x_mult = *(m);
-
-//     for(int i=0; i<x_mult; i++){
-//         for(int j=0; j<x_mult; j++){
-//             //if( *(mat + x_mult * i + j) != 0 ) {
-//                 //printf("%02.19lg\t", *(mat + x_mult * i + j));
-//                 printf(*(m+1 + x_mult * i + j) ? "o  " : "   ");
-//             //}else{
-//                 //printf(" ");
-//             //}
-//         }
-
-//         printf("\n");
-//     }
-    
-// }

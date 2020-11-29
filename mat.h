@@ -26,7 +26,10 @@ bool mat_xy_b(int* mat, int x, int y);
 
 
 // Read Columns of a certain row.
-int * mat_cols(int* mat, int x, int* size);
+// int * mat_cols(int* mat, int x, int* size);
+
+// Read Columns of a certain row.
+void mat_cols(int* mat, int x, int** d, int* size);
 
 
 // Get length M of the matrix
