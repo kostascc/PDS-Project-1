@@ -16,7 +16,6 @@ int * mmarket_import(char* filename){
     FILE *f;
     int M, N, nz;   
     int i;
-    //double *val;
 
 
     /**************
@@ -119,51 +118,6 @@ int * mmarket_import(char* filename){
     mergeSort(I, J, nz);
 
 
-    // int i_tmp, j_tmp, v_tmp;
-    // bool i_grt, j_grt, j_eq, i_eq;
-
-    // for (i = 0; i < nz-1; i++) {
-    //     for (int j = 0; j < nz-i-1; j++){
-        
-    //         i_grt = I[j]>I[j+1];
-    //         j_grt = J[j]>J[j+1];
-    //         j_eq = J[j]==J[j+1];
-    //         i_eq = I[j]==I[j+1];
-            
-    //         if( ( j_grt && i_eq ) || i_grt ){
-    //             i_tmp = I[j];
-    //             j_tmp = J[j];
-    //             v_tmp = val[j];
-
-    //             I[j] = I[j+1];
-    //             J[j] = J[j+1];
-    //             val[j] = val[j+1];
-
-    //             I[j+1] = i_tmp;
-    //             J[j+1] = j_tmp;
-    //             val[j+1] = v_tmp;
-    //         }
-    //     }
-    // }
-        
-
-    // // Clean variables
-
-    // i_tmp = NULL;
-    // j_tmp = NULL;
-    // v_tmp = NULL;
-    // i_grt = NULL;
-    // j_grt = NULL;
-    // j_eq = NULL;
-
-
-    // if(nz<100)
-    //     for(int i=0; i<nz; i++){
-    //         printf("(%d,%d): %d\n", I[i], J[i], 1);
-    //     }
-             
-
-
     /************************
     **  Convert COO to CSR **
     ************************/
@@ -175,15 +129,18 @@ int * mmarket_import(char* filename){
 
 
     // Initialize U  array
-    for (int i=0; i<nz; i++){
+    for (int i=0; i<nz; i++)
+    {
         u[i] = 0;
     }
 
-    for (int i = 0; i < nz; i++){
+    for (int i = 0; i < nz; i++)
+    {
         u[I[i] + 1] += 1;
     }
 
-    for (int i = 0; i < M; i++){
+    for (int i = 0; i < M; i++)
+    {
         u[i + 1] += u[i];
     }
 
@@ -204,23 +161,29 @@ int * mmarket_import(char* filename){
     // ([0] = M, [1] = NZ)
     int *mat = (int *) malloc(malloc_size);
     
-    if(mat == NULL){
+    if(mat == NULL)
+    {
         printf("Memory Allocation Failed Creating the Matrix (%ld bytes).\n", malloc_size); 
         exit(EXIT_FAILURE); 
-    }else{
+    }
+    else
+    {
         printf("Matrix of ");
 
-        if(malloc_size>=1000000){
+        if(malloc_size>=1000000)
+        {
             printf("%.2f MBytes ", ((float)malloc_size/1000000));
         }
-        else if(malloc_size>=1000){
+        else if(malloc_size>=1000)
+        {
             printf("%.2f KBytes ", (float)malloc_size/1000);
         }
-        else{
+        else
+        {
             printf("%d Bytes ", malloc_size);
         }       
 
-        printf("created.\n");
+        printf("created ( M: %d, Non-Zeroes: %d).\n", M, nz);
     }
 
 
@@ -228,18 +191,16 @@ int * mmarket_import(char* filename){
     mat[1] = nz;
 
 
-    for(int i=0; i<M+2; i++){
+    for(int i=0; i<M+2; i++)
+    {
         // U
         mat[i + 2] = u[i];
     }
     
-    for(int i=0; i<nz; i++){
-
+    for(int i=0; i<nz; i++)
+    {
         // D
         mat[  M + i + 2 + 1 ] = J[i];
-
-        // V (Forced to '1')
-        // mat[M + nz + i + 2 + 1 ] = 1;
     }
 
 
@@ -268,7 +229,7 @@ int * mmarket_import(char* filename){
 
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-    printf("Importing took %f s\n", delta_us);
+    printf(" > Import took %f s\n", delta_us);
 
 
     // Return final CSR matrix
