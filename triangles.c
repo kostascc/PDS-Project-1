@@ -7,150 +7,9 @@
 #include "mmarket.h"
 #include <string.h>
 #include <cilk/cilk.h>
+#include "v2.c"
 #include "v3.c"
-
-
-
-
-void find_triangles_v1(int* mat){
-
-   time_t t;
-   srand((unsigned) time(&t));
-
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
-
-   int M = mat_get_M(mat);
-
-   int found = 0;
-
-   int *c = (int *)malloc((M+1) * sizeof(int));
-   
-   for(int k = 0; k < M-2; k++){
-      for(int j = 0; j < M-1; j++){
-         if(j==k) continue;
-         for(int i = 0; i < M; i++){
-            if(i==j||i==k) continue;
-            if(mat_xy_b(mat,i,j) && mat_xy_b(mat,i,k) && mat_xy_b(mat,j,k))
-            {
-               c[i]+=1;
-               c[j]+=1;
-               c[k]+=1;
-
-               found += 1;
-            }
-         }
-      }
-   }
-
-
-   
-   clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-   float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-
-   printf("V1 took %f s, Found %d triangles.\n", delta_us, found); 
-
-   free(c);
-
-   return;
-}
-
-
-
-void find_triangles_v2(int* mat){
-
-   time_t t;
-   srand((unsigned) time(&t));
-
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
-   int found = 0;
-
-   int M = mat_get_M(mat);
-
-   int *c = (int *)malloc((M+1) * sizeof(int));
-   
-   for(int i = 0; i < M; i++)
-   {
-      for(int j = 0; j < i; j++)
-      {
-         if(i==j) continue;
-         for(int k = 0; k < j; k++)
-         {
-            if(k==i||k==j) continue;
-            if( mat_xy_b(mat,i,j) && mat_xy_b(mat,i,k) && mat_xy_b(mat,j,k) ){
-               c[i]+=1;
-               c[j]+=1;
-               c[k]+=1;
-               found+=1;
-            }
-         }
-      }
-   }
-
-
-   
-   clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-   float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-
-   printf("V2 took %f s, Found %d triangles.\n", delta_us, found); 
-
-   free(c);
-
-   return;
-}
-
-
-
-
-void find_triangles_v2_cilk(int* mat){
-
-   time_t t;
-   srand((unsigned) time(&t));
-
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
-
-   int M = mat_get_M(mat);
-
-   int found = 0;
-
-   int *c = (int *)malloc(M * sizeof(int));
-   
-   cilk_for(int i = 0; i < M; i++)
-   {
-      cilk_for(int j = 0; j < i; j++)
-      {
-         if(j==i) continue;
-         cilk_for(int k = 0; k < j; k++)
-         {
-            if(k==i||k==j) continue;
-            if( mat_xy_b(mat,i,j) && mat_xy_b(mat,i,k) && mat_xy_b(mat,j,k) ){
-               c[i]+=1;
-               c[j]+=1;
-               c[k]+=1;
-               found+=1;
-            }
-         }
-      }
-   }
-
-
-
-   
-   clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-   float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-
-   printf("V2/Cilk took %f s, Found %d triangles.\n", delta_us, found); 
-
-   free(c);
-
-   return;
-}
-
+#include "v4.c"
 
 
 
@@ -210,21 +69,14 @@ int main(int argc, char *argv[]){
    int* mat = mmarket_import(argv[1]); // Import MM
 
 
-   /**************
-   ** Run Tests **
-   **************/
+   /*****************
+   ** Run versions **
+   *****************/
 
    for(int i=0; i<argc; i++){
-      if(strcmp(argv[i],"-v1")==0){
-         find_triangles_v1(mat);
-      }
 
       if(strcmp(argv[i],"-v2")==0){
          find_triangles_v2(mat);
-      }
-
-      if(strcmp(argv[i],"-v2clk")==0){
-         find_triangles_v2_cilk(mat);
       }
 
       if(strcmp(argv[i],"-v3")==0){
@@ -232,35 +84,41 @@ int main(int argc, char *argv[]){
       }
 
       if(strcmp(argv[i],"-v3clk")==0){
-         find_triangles_v3_cilk(mat);
+         find_triangles_v3_cilk(mat, __threads);
+      }
+      // if(strcmp(argv[i],"-v3omp")==0){
+      //    find_triangles_v3_omp(mat, __threads);
+      // }
+
+      if(strcmp(argv[i],"-v4")==0){
+         v4_simple(mat);
       }
    }
 
 
 
-   // // Test
+   // int* d = malloc(mat_get_M(mat)*sizeof(int));
+   // int s;      
 
-   // for (int i=0; i<mat_get_M(mat); i++){
+   // for(int i=0; i<mat_get_M(mat); i++){
+   //    printf("i:%d [", i);
 
-   //    for (int j=0; j<mat_get_M(mat); j++){
+   //    mat_cols(mat, i, &d, &s);
+
+   //    for(int j=0; j<s; j++){
+   //       printf("%d ", d[j]);
+   //    }
+
+   //    for(int j=0; j<mat_get_M(mat); j++){
    //       if(mat_xy_b(mat,i,j)){
-   //          printf("(%d,%d),", i, j);
+   //          printf("(%d,%d), ", i, j);
    //       }
    //    }
 
-   //    printf("\n");
-      
-   //    int size;
-   //    int *d = mat_cols(mat, i, &size);
+   //    printf("]\n");
 
-   //    printf("ROW[%d] size %d: ", i, size);
-
-   //    for(int i=0; i<size; i++){
-   //       printf("%d ", d[i]);
-   //    }
-
-   //    printf("\n");
    // }
+
 
 
 
@@ -269,7 +127,6 @@ int main(int argc, char *argv[]){
    ***************/
 
    free(mat);
-   mat = NULL;
 
 
    // The End!
