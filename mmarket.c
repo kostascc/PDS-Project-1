@@ -83,15 +83,29 @@ int * mmarket_import(char* filename){
     /*   specifier as in "%lg", "%lf", "%le", otherwise errors will occur */
     /*  (ANSI C X3.159-1989, Sec. 4.9.6.2, p. 136 lines 13-15)            */
 
+    int offset = 0;
+    int xx, yy;
+
     for (i=0; i<nz; i++)
     {
-        fscanf(f, "%d %d\n", &I[i], &J[i]);
-        I[i]--;  /* adjust from 1-based to 0-based */
-        J[i]--;
+        fscanf(f, "%d %d\n", &xx, &yy);
+
+        if(xx == yy)
+        {
+            offset += 1;
+            continue;
+        }
+
+        I[i - offset] = xx - 1;
+        J[i - offset] = yy - 1;
+
     }
 
+
     if (f !=stdin) fclose(f);
-    
+
+    // Remove null items offset
+    nz -= offset;
 
 
     /********************
