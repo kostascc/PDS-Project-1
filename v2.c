@@ -11,7 +11,7 @@ void find_triangles_v2(int* mat){
 
    int M = mat_get_M(mat);
 
-   int *c = (int *)malloc((M+1) * sizeof(int));
+   int *c = (int *)calloc(M, M* sizeof(int));
    
    for(int i = 0; i < M; i++)
    {
@@ -35,6 +35,13 @@ void find_triangles_v2(int* mat){
    float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
 
    printf(" > V2 took %f s, Found %d triangles.\n", delta_us, found); 
+
+   printf("\n");
+      for(int i=0; i<M; i++){
+         printf("%d ", c[i]);
+      }
+
+      printf("\n\n");
 
    free(c);
 
