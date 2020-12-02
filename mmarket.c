@@ -6,10 +6,11 @@
 #include <cilk/cilk.h>
 #include "mat.h"
 #include "mmio.h"
+#include "mmarket.h"
 
 
 
-int * mmarket_import(char* filename){
+int * mmarket_import(char* filename, bool __show_info){
 
     int ret_code;
     MM_typecode matcode;
@@ -23,24 +24,21 @@ int * mmarket_import(char* filename){
     **************/
 
 
-   time_t t;
-   srand((unsigned) time(&t));
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
+    if(__show_info)
+        printf("[Begin Reading File...]\n");
 
-    printf("[Begin Reading File...]\n");
 
     if ((f = fopen(filename, "r")) == NULL) {
         printf("Couldn't Open the specified file: \"%s\"\n", filename);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 
     if (mm_read_banner(f, &matcode) != 0)
     {
         printf("Could not process Matrix Market banner.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 
@@ -52,13 +50,13 @@ int * mmarket_import(char* filename){
     {
         printf("Sorry, this application does not support ");
         printf("Market Market type: [%s]\n", mm_typecode_to_str(matcode));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     /* find out size of sparse matrix .... */
 
     if ((ret_code = mm_read_mtx_crd_size(f, &M, &N, &nz)) !=0)
-        exit(1);
+        exit(EXIT_FAILURE);
         
 
     if(M!=N){
@@ -71,9 +69,11 @@ int * mmarket_import(char* filename){
 
     // COO Row index
     int* I = (int *) malloc(nz * sizeof(int));
+    if(I==NULL) exit(EXIT_FAILURE);
 
     // COO Column index
     int* J = (int *) malloc(nz * sizeof(int));
+    if(J==NULL) exit(EXIT_FAILURE);
 
     // COO Value
     // val = (double *) malloc(nz * sizeof(double));
@@ -107,11 +107,26 @@ int * mmarket_import(char* filename){
     nz -= offset;
 
 
+    return mmarket_aux(__show_info, I, J, M, nz);
+}
+
+
+
+int * mmarket_aux(bool __show_info, int* I, int* J, int M, int nz)
+{
+
+    
+    time_t t;
+    srand((unsigned) time(&t));
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
     /********************
     ** Sort COO Matrix **
     ********************/
 
-    printf("[Begin Sorting...]\n");
+    if(__show_info)
+        printf("[Begin Sorting...]\n");
 
     switcharoo_to_lower_triangle(I, J, nz);
 
@@ -122,7 +137,8 @@ int * mmarket_import(char* filename){
     **  Convert COO to CSR **
     ************************/
 
-    printf("[Begin Creating CSR...]\n");
+    if(__show_info)
+        printf("[Begin Creating CSR...]\n");
 
     // Upper / Row Position
     int *u = malloc(nz * sizeof(int));
@@ -149,8 +165,8 @@ int * mmarket_import(char* filename){
     /*********************
     ** Create final mat **
     *********************/
-
-    printf("[Begin Creating Matrix...]\n");
+    if(__show_info)
+        printf("[Begin Creating Matrix...]\n");
 
     // Size of mat: 3*nz +3.
     // (+1 for M in [0],
@@ -166,8 +182,9 @@ int * mmarket_import(char* filename){
         printf("Memory Allocation Failed Creating the Matrix (%ld bytes).\n", malloc_size); 
         exit(EXIT_FAILURE); 
     }
-    else
+    else if(__show_info)
     {
+        
         printf("Matrix of ");
 
         if(malloc_size>=1000000)
@@ -229,10 +246,13 @@ int * mmarket_import(char* filename){
 
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-    printf(" > Import took %f s\n", delta_us);
+    
+    if(__show_info)
+        printf(" > Import took %f s\n", delta_us);
 
 
     // Return final CSR matrix
 	return mat;
+
 }
 
