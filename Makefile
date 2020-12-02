@@ -23,7 +23,11 @@ mat:
 	$(CC) $(CFLAGS) -shared -o libmat.so mat.o msort.o
 
 triangles: 
-	$(CILKCC) $(CFLAGS) -o triangles.o triangles.c mat.o mmarket.o mmio.o msort.o -fcilkplus
+	$(CC) $(CFLAGS) -o triangles.o triangles.c mat.o mmarket.o mmio.o msort.o -lpthread -fcilkplus -fopenmp
+
+testfunc: 
+	$(CC) $(CFLAGS) -o testfunc.o testfunc.c
+
 
 all: msort mmio mat mmarket triangles
 
