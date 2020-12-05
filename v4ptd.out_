@@ -1,0 +1,11 @@
+*************************************************
+*  Triangulinator - Made by K. Chatzis           
+*    <kachatzis@ece.auth.gr>                     
+*  ~ Configuration ~                             
+* Threads: 2                                    
+*************************************************
+[Begin Reading File...]
+[Begin Sorting...]
+[Begin Creating CSR...]
+[Begin Creating Matrix...]
+Matrix of 136 Bytes created ( M: 12, Non-Zeroes: 19).

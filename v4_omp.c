@@ -1,3 +1,14 @@
+#include "v4_omp.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include "mat.h"
+#include <time.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 #include "mat.h"
 #include <omp.h>
 
@@ -8,38 +19,20 @@
 
 
 
-void __v4_openmp_f1(int* mat, int** d, int i, int* c, int* found, int __threads_, int t)
-{
-
-    int d_;
-    mat_cols(mat, i, &(d[t]), &d_);
-
-    for(int jj=0; jj<d_; jj++)
-    {
-        
-        int j = d[t][jj];
-
-        for(int i_=0; i_<d_; i_++){
-
-            if( /*mat_xy_b(mat, i, d[i_]) &&*/ 
-                mat_xy_b(mat, d[t][i_], j) ) 
-                found[t] += 1;
-                
-        }
-        
-    }
-
-    return;
-}
-
-
 
 void v4_openmp(int* mat, bool __show_c, bool __show_info, int __threads)
 {
 
+    // Start Timer
+    time_t t;
+    srand((unsigned) time(&t));
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+
     int M = mat_get_M(mat);
 
-    int __threads_ = M > 1200 ? 1200 : M;
+    int __threads_ = /*M > 35 ? 35 **/ __threads /*: M*/;
 
     int* d[__threads_];
     int found[__threads_];
@@ -56,21 +49,16 @@ void v4_openmp(int* mat, bool __show_c, bool __show_info, int __threads)
     }
 
 
-    
-    // Start Timer
-    time_t t;
-    srand((unsigned) time(&t));
-    struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
 
     // For each row
+     #pragma omp parallel
+    {
     for(int i=0; i<M; i+=__threads_)
     {
 
-        #pragma omp parallel
-        {
-            #pragma omp for schedule(dynamic) nowait
+        // #pragma omp parallel
+        // {
+            #pragma omp for schedule(static,1) nowait
             for(int t=0; t<__threads_; t++)
             {
 
@@ -79,6 +67,11 @@ void v4_openmp(int* mat, bool __show_c, bool __show_info, int __threads)
 
                     int d_;
                     mat_cols(mat, t+i, &(d[t]), &d_);
+
+                    if(d_<=0)
+                    {
+                        continue;
+                    }
 
                     for(int jj=0; jj<d_; jj++)
                     {

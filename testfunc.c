@@ -28,8 +28,10 @@ void switcharoo_to_lower_triangle(uint32_t *I, uint32_t *J, uint32_t nz);
 
 int main(){
 
-    uint32_t I[] = {1,2,3,3,4,5,5,5,6,6,6,7,8,9,10,10,11,11,11};
-    uint32_t J[] = {0,1,0,2,1,0,1,4,0,3,5,1,7,7,1,2,1,2,10};
+    // 12 6 6 6 6 6 12 12 3 12 6 6 6 6 6 6 3 12 12 12 6 12 3 3
+    // 3 5 3 1 1 3 2 0 0 0 3 3
+    uint32_t J[] = {2,3,4,4,5,6,6,6,7,7,7,8,9,10,11,11,12,12,12};
+    uint32_t I[] = {1,2,1,3,2,1,2,5,1,4,6,2,8,8,2,3,2,3,11};
 
     uint32_t* c = vertexWiseTriangleCounts( I, J, 12, 19 );
     
@@ -135,6 +137,11 @@ uint32_t* vertexWiseTriangleCounts( uint32_t *coo_row, uint32_t *coo_col, uint32
 
 uint32_t * mmarket_aux(bool __show_info, uint32_t* I, uint32_t* J, uint32_t M, uint32_t nz)
 {
+
+    for(int i=0; i<nz; i++){
+        I[i]--;
+        J[i]--;
+    }
 
 
     /********************

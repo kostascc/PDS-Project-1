@@ -12,6 +12,13 @@
 
 int * mmarket_import(char* filename, bool __show_info){
 
+
+    time_t t;
+    srand((unsigned) time(&t));
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+
     int ret_code;
     MM_typecode matcode;
     FILE *f;
@@ -22,7 +29,6 @@ int * mmarket_import(char* filename, bool __show_info){
     /**************
     ** Open File **
     **************/
-
 
 
     if(__show_info)
@@ -107,19 +113,16 @@ int * mmarket_import(char* filename, bool __show_info){
     nz -= offset;
 
 
-    return mmarket_aux(__show_info, I, J, M, nz);
-}
+//     return mmarket_aux(__show_info, I, J, M, nz);
+// }
 
 
 
-int * mmarket_aux(bool __show_info, int* I, int* J, int M, int nz)
-{
+// int * mmarket_aux(bool __show_info, int* I, int* J, int M, int nz)
+// {
 
     
-    time_t t;
-    srand((unsigned) time(&t));
-    struct timespec start, end;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+    
 
     /********************
     ** Sort COO Matrix **

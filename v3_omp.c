@@ -1,3 +1,10 @@
+#include "v3_omp.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include "mat.h"
+#include <time.h>
+
 
 /******************
  * OpenMP
@@ -6,9 +13,16 @@
 void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __threads)
 {
 
+    // Start Timer
+   time_t t;
+   srand((unsigned) time(&t));
+   struct timespec start, end;
+   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+
+
     int M = mat_get_M(mat);
 
-   int __threads_ = M > 1200 ? 1200 : M;
+   int __threads_ = /*M > 35 ? 35 **/ __threads /*: M*/;
 
    int found[__threads_];
 
@@ -18,7 +32,7 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
 
 
    // Initialize Mallocs for each thread
-   cilk_for(int tt=0; tt<__threads_; tt++)
+   for(int tt=0; tt<__threads_; tt++)
    {
       d_i[tt]  = malloc(M * sizeof(int));
       if(d_i[tt]==NULL) exit(EXIT_FAILURE);
@@ -33,20 +47,17 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
    }
 
 
-   // Start Timer
-   time_t t;
-   srand((unsigned) time(&t));
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+   
 
 
    // For each Second node j
+   #pragma omp parallel
+    {
    for(int j=0; j<M; j+=__threads_)
    {
 
-    #pragma omp parallel
-    {
-        #pragma omp for schedule(dynamic) nowait
+    
+        #pragma omp for schedule(static,1) nowait
         for(int t=0; t<__threads_; t++)
         {
 
@@ -61,50 +72,50 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
                     continue;
                 }
 
-                for(int i_indx=0; i_indx<size_d_j; i_indx++)
-                {
-
-                    int i = d_j[t][i_indx];
-
-                    if(i==j+t) continue;
-
-                    int size_d_i;
-                    mat_cols(mat, i, &(d_i[t]), &size_d_i);
-
-                    for(int e_indx=0; e_indx<size_d_i; e_indx++)
+                    for(int i_indx=0; i_indx<size_d_j; i_indx++)
                     {
-                        
-                        int e = d_i[t][e_indx];
 
-                        if(e==i) 
+                        int i = d_j[t][i_indx];
+
+                        if(i==j+t) continue;
+
+                        int size_d_i;
+                        mat_cols(mat, i, &(d_i[t]), &size_d_i);
+
+                        for(int e_indx=0; e_indx<size_d_i; e_indx++)
                         {
-                        continue;
-                        }
-
-                        for(int k_indx=0; k_indx<size_d_j; k_indx++)
-                        {
-                        
-                        int k = d_j[t][k_indx];
-
-                        if(i==e||e==j+t) continue;
-
-                        // Found
-                        if(e==k) 
-                        {
-                            found[t]+=1;
-
-                            c[t][i]+=1;
-                            c[t][k]+=1;
-                            c[t][j+t]+=1;
-
-                        }
                             
+                            int e = d_i[t][e_indx];
+
+                            if(e==i) 
+                            {
+                            continue;
+                            }
+
+                            for(int k_indx=0; k_indx<size_d_j; k_indx++)
+                            {
+                            
+                            int k = d_j[t][k_indx];
+
+                            if(i==e||e==j+t) continue;
+
+                            // Found
+                            if(e==k) 
+                            {
+                                found[t]+=1;
+
+                                c[t][i]+=1;
+                                c[t][k]+=1;
+                                c[t][j+t]+=1;
+
+                            }
+                                
+                            }
+
                         }
 
                     }
-
-                }
-
+                
 
             }   
         }
@@ -114,10 +125,9 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
    }
 
     
-   
 
     int found_ = 0;
-    int* cc = calloc(M, sizeof(int));
+    int* cc = (int *)calloc(M,sizeof(int));
 
     for(int tt=0; tt<__threads_; tt++)
     {
@@ -130,7 +140,7 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
 
         free(d_i[tt]);
         free(d_j[tt]);
-        free(c[tt]);
+        //free(c[tt]);
     }
 
     
@@ -143,15 +153,8 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
 
    if(__show_c)
    {
-      int* cc = (int *)calloc(M,sizeof(int) * M);
       
-      for(int tt=0; tt<__threads_; tt++)
-      {
-         cilk_for(int i=0; i<M; i++)
-         {
-            cc[i] += c[tt][i];
-         }
-      }
+      
 
       printf("\n");
       for(int i=0; i<M; i++)
@@ -162,6 +165,11 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
       printf("\n\n");
 
       free(cc);
+   }
+
+    for(int tt=0; tt<__threads_; tt++)
+   {
+      free(c[tt]);
    }
 
 

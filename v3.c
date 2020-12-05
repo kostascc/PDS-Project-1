@@ -1,4 +1,14 @@
+#include "v3.h"
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include "mat.h"
+#include <time.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 
 /******************
@@ -8,6 +18,11 @@
 void find_triangles_v3(int* mat, bool __show_c, bool __show_info)
 {
 
+   // Start Timer
+   time_t t;
+   srand((unsigned) time(&t));
+   struct timespec start, end;
+   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
    
 
    int found = 0;
@@ -26,15 +41,11 @@ void find_triangles_v3(int* mat, bool __show_c, bool __show_info)
    int i_g_j = 0;
 
 
-   // Start Timer
-   time_t t;
-   srand((unsigned) time(&t));
-   struct timespec start, end;
-   clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-
+   
+   int j;
 
    // i j k
-   for(int j=0; j<M; j++)
+   for(j=0; j<M; j++)
    {
 
       int size_d_j = M;

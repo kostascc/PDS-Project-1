@@ -1,0 +1,51 @@
+/// com-Youtube ///
+
+
+# batch 20 #
+
+
+ > V3           took 3.291650 s, Found 3056386 triangles.
+
+ > V3/Cilk      took 0.902140 s, Found 3056386 triangles.
+
+ > V3/OpenMP    took 0.483903 s, Found 3056386 triangles.
+
+ > V4/Cilk      took 1.030983 s, Found 3056386 triangles.
+
+ > V4/OpenMP    took 0.661095 s, Found 3056386 triangles.
+
+
+
+
+
+
+
+
+
+
+
+
+sbatch --ntasks=20 --partition=batch --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v3 "
+sbatch --ntasks=20 --partition=batch --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v3clk "
+sbatch --ntasks=20 --partition=batch --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v3omp "
+sbatch --ntasks=20 --partition=batch --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v4 "
+sbatch --ntasks=20 --partition=batch --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v4clk "
+sbatch --ntasks=20 --partition=batch --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v4omp "
+
+
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v3 "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v3clk "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v3omp "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v4 "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v4clk "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx .mtx -t20 -c0 -v4omp "
+
+
+
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx -t18 -c0 -v3 "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx -t18 -c0 -v3clk "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx -t18 -c0 -v3omp "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx -t18 -c0 -v4 "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx -t18 -c0 -v4clk "
+sbatch --ntasks=20 --partition=gpu --time=00:30 slurm.sh "mtx/com-Youtube.mtx -t18 -c0 -v4omp "
+

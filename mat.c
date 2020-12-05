@@ -227,7 +227,8 @@ void mat_cols(int* mat, int x, int** d, int* size)
     if(x > mat[0] || x < 0)
     {
         printf("mat_cols: Array out of bounds (%d).\n", x);
-        return NULL;
+        exit(EXIT_FAILURE);
+        return;
     }
 
     // Columns Begin
@@ -239,13 +240,14 @@ void mat_cols(int* mat, int x, int** d, int* size)
     if(cols_begin > cols_end)
     {
         printf("mat_cols: Error decoding CSR data (%d-%d).\n", cols_begin, cols_end);
-        return NULL;
+        exit(EXIT_FAILURE);
+        return;
     }
     else if(cols_begin == cols_end)
     {
         // No Connections
         *(size) = 0;
-        return NULL;
+        return;
     }
 
 
@@ -264,7 +266,7 @@ void mat_cols(int* mat, int x, int** d, int* size)
         *(*d + i - cols_begin -1 ) = mat[i + mat[0]+2];
     }
 
-    return d;
+    return;
 }
 
 
@@ -301,4 +303,77 @@ int mat_get_NZ(int* mat)
     }
 }
 
+
+
+void _coo_row(int* mat)
+{
+    int M = mat_get_M(mat);
+    int* d = malloc(M*sizeof(int));
+    int d_;
+
+
+
+    for(int i=0; i<M; i++){
+        mat_cols(mat, i, &d, &d_);
+        for(int ii=0; ii<d_; ii++){
+            printf("%d,", i+1);
+        }
+    }
+
+    printf("\n");
+
+    // for(int i=0; i<M; i++){
+    //     mat_cols(mat, i, &d, &d_);
+    //     for(int ii=0; ii<d_; ii++){
+    //         printf("%d,", d[ii]);
+    //     }
+    // }
+}
+
+
+void _coo_col(int* mat)
+{
+    int M = mat_get_M(mat);
+    int* d = malloc(M*sizeof(int));
+    int d_;
+
+
+
+    // for(int i=0; i<M; i++){
+    //     mat_cols(mat, i, &d, &d_);
+    //     for(int ii=0; ii<d_; ii++){
+    //         printf("%d,", i);
+    //     }
+    // }
+
+    // printf("\n");
+
+    for(int i=0; i<M; i++){
+        mat_cols(mat, i, &d, &d_);
+        for(int ii=0; ii<d_; ii++){
+            printf("%d,", d[ii]+1);
+        }
+    }
+
+    printf("\n");
+
+}
+
+
+void _coo(int* mat)
+{
+    int M = mat_get_M(mat);
+    int* d = malloc(M*sizeof(int));
+    int d_;
+
+
+
+    for(int i=0; i<M; i++){
+        mat_cols(mat, i, &d, &d_);
+        for(int ii=0; ii<d_; ii++){
+            printf("%d %d\n", i+1, d[ii]+1);
+        }
+    }
+
+}
 
