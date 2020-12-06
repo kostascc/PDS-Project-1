@@ -8,7 +8,10 @@
 
 
 
-
+/**
+ * Returns Upper row of CSR
+ * (Row index)
+ **/
 int * mat_get_u(int* mat)
 {
 
@@ -27,7 +30,10 @@ int * mat_get_u(int* mat)
 }
 
 
-
+/**
+ * Returns lower row of CSR
+ * (Columns)
+ **/
 int * mat_get_d(int* mat)
 {
 

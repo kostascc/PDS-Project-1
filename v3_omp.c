@@ -150,59 +150,68 @@ void find_triangles_v3_omp(int* mat, bool __show_c, bool __show_info, int __thre
 
         }
 
-   }
+    }
 
     
 
+    // Collective triangle count
     int found_ = 0;
+
+
+    // Collective C vector
     int* cc = (int *)calloc(M,sizeof(int));
 
+
+    // For each thread
     for(int tt=0; tt<__threads_; tt++)
     {
+
+        // Sum thread count to Overall triangle count
         found_ += found[tt];
 
+        // Sum Up the c vector for every row
         for(int i=0; i<M; i++)
         {
             cc[i] += c[tt][i];
         }
 
+        // Free memory
         free(d_i[tt]);
         free(d_j[tt]);
-        //free(c[tt]);
+        free(c[tt]);
     }
+
 
     
     // Stop Timer
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
     float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
 
+
     // Show Info
     if(__show_info)
         printf(" > V3/OpenMP took %f s, Found %d triangles.\n", delta_us, found_); 
 
-   if(__show_c)
-   {
-      
-      
+   
+    // Show C vector
+    if(__show_c)
+    {
+        printf("\n");
+        for(int i=0; i<M; i++)
+        {
+            printf("%d ", cc[i]);
+        }
 
-      printf("\n");
-      for(int i=0; i<M; i++)
-      {
-         printf("%d ", cc[i]);
-      }
+        printf("\n\n");
 
-      printf("\n\n");
-
-      free(cc);
-   }
-
-    for(int tt=0; tt<__threads_; tt++)
-   {
-      free(c[tt]);
    }
 
 
-   return;
+
+    // Clean Up
+    free(cc);
+
+    return;
 
 }
 

@@ -58,7 +58,7 @@ void v4_cilk(int* mat, bool __show_c, bool __show_info, int __threads)
     int found[__threads_];
     int* c[__threads_];
     
-    
+
     // Collective Triangle sum
     int c_ = 0;
 
@@ -71,8 +71,10 @@ void v4_cilk(int* mat, bool __show_c, bool __show_info, int __threads)
     }
 
 
-    // pthread_mutex_t mux;
-    // pthread_mutex_init(&mux, NULL);
+    // Not used
+    // I leave it here for now
+    pthread_mutex_t mux;
+    pthread_mutex_init(&mux, NULL);
 
 
     // For each row i
@@ -98,7 +100,8 @@ void v4_cilk(int* mat, bool __show_c, bool __show_info, int __threads)
     {
 
         // Sum Up the c vector for every row
-        for(int i=0; i<M; i++){
+        for(int i=0; i<M; i++)
+        {
             cc[i] += c[tt][i];
         }
 
