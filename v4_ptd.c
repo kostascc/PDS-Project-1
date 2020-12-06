@@ -3,7 +3,7 @@
 
 
 /******************
- * Cilk
+ * PThreads
  * ****************/
 
 
@@ -17,7 +17,7 @@ typedef struct _t_data
     int t;
     int* i;
     pthread_cond_t*  threadAvailSgnl;
-    pthread_mutex_t rwCriticalMux;
+    pthread_mutex_t* rwCriticalMux;
     bool *pts;
     int *availThreads;
     int M;
@@ -29,21 +29,20 @@ typedef struct _t_data
 void __v4_ptd_f1(void* t_data_)
 {
 
+    //3056386
 
     struct _t_data t_data = *((struct _t_data *)t_data_);
 
     int t = t_data.t;  
 
-    // printf("t %d\n", (struct _t_data *)t_data->t);
-
     bool run = true;
 
     int i;
 
-    pthread_mutex_lock( &(t_data.rwCriticalMux) );
+    pthread_mutex_lock( (t_data.rwCriticalMux) );
     i = *(t_data.i);
     *(t_data.i) = i+1;
-    pthread_mutex_unlock( &(t_data.rwCriticalMux) );
+    pthread_mutex_unlock( (t_data.rwCriticalMux) );
 
     while(i < t_data.M)
     {
@@ -86,11 +85,11 @@ void __v4_ptd_f1(void* t_data_)
         }
 
 
-        sleep(1);
-        pthread_mutex_lock( &(t_data.rwCriticalMux) );
+        // sleep(1);
+        pthread_mutex_lock( (t_data.rwCriticalMux) );
         i = *(t_data.i);
         *(t_data.i) = i+1;
-        pthread_mutex_unlock( &(t_data.rwCriticalMux) );
+        pthread_mutex_unlock( (t_data.rwCriticalMux) );
         
 
         if(i >= t_data.M)
@@ -178,7 +177,7 @@ void v4_pthread(int* mat, bool __show_c, bool __show_info, int __threads)
         t_data[tt].t        = tt;       // int
 
         // pthread_mutex_t*
-        t_data[tt].rwCriticalMux = rwCriticalMux;
+        t_data[tt].rwCriticalMux = &rwCriticalMux;
         
     }
 
