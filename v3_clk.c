@@ -146,7 +146,7 @@ void find_triangles_v3_cilk(int* mat, bool __show_c, bool __show_info, int __thr
    
 
    // Clean Up
-   free(c);
+   free(cc);
 
    return;
 }
