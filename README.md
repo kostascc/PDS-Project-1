@@ -33,3 +33,15 @@ Usage: ./triangles.o [mtx-filename] [arguments]
  -coocol Print 1-Based COO columns horiizonntally.
  -coo    Print 1-Based COO rows and columns vertically.
 ````
+
+
+## Testing
+
+Use `-c2` as an argument, for the C vector to be printed on its own. For comparing the two outputs, use the `compare` script.
+
+Example: 
+````
+./run "<Path to mtx file> -t<threads> -c2 -v4omp > out_v4_omp.out_ "
+./run "<Path to mtx file> -t<threads> -c2 -v3omp > out_v3_omp.out_ "
+./compare out_v4_omp.out_ out_v3_omp.out_
+````
