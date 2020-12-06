@@ -19,7 +19,6 @@ void v4_simple(int* mat, bool __show_c, bool __show_info)
 {
 
 
-    printf("a1\n");
 
     // Start Timer
     time_t t;
@@ -27,21 +26,19 @@ void v4_simple(int* mat, bool __show_c, bool __show_info)
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
-    
     int M = mat_get_M(mat);
 
     int *d = malloc(M*sizeof(int));
-    if(d==NULL) exit(EXIT_FAILURE);
+    if(d==NULL) {exit(EXIT_FAILURE);}
 
     int *dd = malloc(M*sizeof(int));
-    if(dd==NULL) exit(EXIT_FAILURE);
+    if(dd==NULL) {exit(EXIT_FAILURE);}
 
-    int *c = (int *)calloc(M, M*sizeof(int));
-    if(c==NULL) exit(EXIT_FAILURE);
+    int *c = (int *)calloc(M, sizeof(int));
+    if(c==NULL) {exit(EXIT_FAILURE);}
 
     int d_, dd_, c_ = 0;
 
- printf("a2\n");
 
     // For each row
     for(int i=0; i<M; i++)
@@ -79,16 +76,12 @@ void v4_simple(int* mat, bool __show_c, bool __show_info)
 
     }
 
-    printf("a3\n");
    free(d);
    free(dd);
    
-   printf("a4\n");
 
    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
    float delta_us = (float) ((end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000)/ (1000000);
-
-printf("a5\n");
 
     if(__show_info)
         printf(" > V4 took %f s, Found %d triangles.\n", delta_us, c_); 
