@@ -7,6 +7,9 @@
  * ****************/
 
 
+/**
+ * Thread Data Struct
+ **/
 
 typedef struct _t_data 
 {
@@ -24,91 +27,17 @@ typedef struct _t_data
 };
 
 
-
-
-void __v4_ptd_f1(void* t_data_)
-{
-
-    //3056386
-
-    struct _t_data t_data = *((struct _t_data *)t_data_);
-
-    int t = t_data.t;  
-
-    bool run = true;
-
-    int i;
-
-    pthread_mutex_lock( (t_data.rwCriticalMux) );
-    i = *(t_data.i);
-    *(t_data.i) = i+1;
-    pthread_mutex_unlock( (t_data.rwCriticalMux) );
-
-    while(i < t_data.M)
-    {
-
-        // printf("t:%d  i:%d\n", t, i);
-
-        int d_;
-        mat_cols(t_data.mat, i, &(t_data.d[t]), &d_);
-
-
-        if(d_>0)
-        {
-
-            for(int jj=0; jj<d_; jj++)
-            {
-                
-                int j = t_data.d[t][jj];
-
-                for(int i_=0; i_<d_; i_++){
-
-                    if( mat_xy_b(t_data.mat, t_data.d[t][i_], j) ) 
-                    {
-                        
-                        // pthread_mutex_lock(&mux);
-
-                        t_data.found[ t ] += 1;
-
-                        t_data.c[ t ][ i ] ++;
-                        t_data.c[ t ][ j ] ++;
-                        t_data.c[ t ][ t_data.d[ t ][ i_ ] ] ++;
-
-                        // pthread_mutex_unlock(&mux);
-
-                    }                
-                        
-                }
-                
-            }
-
-        }
-
-
-        // sleep(1);
-        pthread_mutex_lock( (t_data.rwCriticalMux) );
-        i = *(t_data.i);
-        *(t_data.i) = i+1;
-        pthread_mutex_unlock( (t_data.rwCriticalMux) );
-        
-
-        if(i >= t_data.M)
-        {
-            run = false;
-        }
-        
-
-    }
-
-
-    pthread_exit(NULL);
-
-    return;
-
-}
+/**
+ * Auxiliary function.
+ * This is called for each pthread
+ **/
+void __v4_ptd_f1(void* t_data_);
 
 
 
+/**
+ * Main Function 
+ **/
 void v4_pthread(int* mat, bool __show_c, bool __show_info, int __threads)
 {
     
@@ -246,7 +175,8 @@ void v4_pthread(int* mat, bool __show_c, bool __show_info, int __threads)
     int* cc = calloc(M, sizeof(int));   // Collective C
 
     // For each thread
-    for(int tt=0; tt<__threads_;tt++){
+    for(int tt=0; tt<__threads_;tt++)
+    {
 
         /**
          * For each row, add the value on
@@ -295,3 +225,111 @@ void v4_pthread(int* mat, bool __show_c, bool __show_info, int __threads)
 
 }
 
+
+
+
+
+void __v4_ptd_f1(void* t_data_)
+{
+
+    /**
+     * Thread Data.
+     * Every thread has access to the
+     * same variables.
+     **/
+    struct _t_data t_data = *((struct _t_data *)t_data_);
+
+
+    // Thread Id
+    int t = t_data.t;  
+
+
+    /**
+     * Row
+     * No other Thread should ever have the
+     * same i.
+     **/ 
+    int i;
+
+
+
+    /** 
+     * rwCriticalMux is locked only when making 
+     * changes to the variable i.
+     **/
+    pthread_mutex_lock( (t_data.rwCriticalMux) );
+    i = *(t_data.i);    // Take the next i
+    *(t_data.i) = i+1;  // and increment by 1.
+    pthread_mutex_unlock( (t_data.rwCriticalMux) );
+
+
+    // If i is still in bounds
+    while(i < t_data.M)
+    {
+
+
+        int d_;
+
+        // Get Columns of i
+        mat_cols(t_data.mat, i, &(t_data.d[t]), &d_);
+
+
+        if(d_>0)    // i has columns
+        {
+
+            // For every column j
+            for(int jj=0; jj<d_; jj++)
+            {
+                
+                int j = t_data.d[t][jj];
+
+
+                // For every column of i
+                for(int i_=0; i_<d_; i_++){
+
+
+                    // If there is an edge
+                    if( mat_xy_b(t_data.mat, t_data.d[t][i_], j) ) 
+                    {
+                        // A triangle has been found!
+
+                        t_data.found[ t ] += 1;
+
+
+                        /**
+                         * This is matrix multiplication.
+                         * The rows and columns are added, 
+                         * but the product is always 1, 
+                         * so the sum is just incremented by 1.
+                         **/
+
+                        t_data.c[ t ][ i ] ++;
+                        t_data.c[ t ][ j ] ++;
+                        t_data.c[ t ][ t_data.d[ t ][ i_ ] ] ++;
+
+
+                    }                
+                        
+                }
+                
+            }
+
+        }
+
+
+        
+        pthread_mutex_lock( (t_data.rwCriticalMux) );
+        i = *(t_data.i);    // Take the next i
+        *(t_data.i) = i+1;  // and increment by 1.
+        pthread_mutex_unlock( (t_data.rwCriticalMux) );
+        
+    }
+
+
+    // Close Thread
+
+    pthread_exit(NULL);
+
+    return;
+
+}

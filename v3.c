@@ -11,6 +11,7 @@
 #include <time.h>
 
 
+
 /******************
  * Serial
  * ****************/
@@ -39,13 +40,13 @@ void find_triangles_v3(int* mat, bool __show_c, bool __show_info)
     * C is the final triangle count vector.
     **/ 
    int *d_i = (int *)malloc(M*sizeof(int));
-   if(d_i==NULL) exit(EXIT_FAILURE);
+   if(d_i==NULL)  exit(EXIT_FAILURE);
 
    int *d_j = (int *)malloc(M*sizeof(int));
-   if(d_j==NULL) exit(EXIT_FAILURE);
+   if(d_j==NULL)  exit(EXIT_FAILURE);
 
-   int *c = (int *)calloc(M, sizeof(int));
-   if(c==NULL) exit(EXIT_FAILURE);
+   int *c   = (int *)calloc(M, sizeof(int));
+   if(c==NULL)    exit(EXIT_FAILURE);
 
 
    
@@ -110,6 +111,7 @@ void find_triangles_v3(int* mat, bool __show_c, bool __show_info)
                if(e==k)       // e exists in i
                {
                   found+=1;
+                  
                   c[i]++;
                   c[k]++;
                   c[j]++;
