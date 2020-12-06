@@ -2,9 +2,9 @@
 
 The main function can be found in triangles.c, while v3.c, 3vclk.c, v3omp.c, v4.c, v4clk.c, v4omp.c, v4ptd.c contain implementations of the two versions in serial and parallel forms.
 
-The project can be Compiled and run by using:
+The project can be Compiled and executed by using:
 ````
-./run "<Path to mtx file> -t8 -c0 -v4omp -v3clk "
+./run "<Path to mtx file> -t<threads> -c0 -v4omp -v3clk <any implementations, see below> "
 ````
 
 The available arguments are:
